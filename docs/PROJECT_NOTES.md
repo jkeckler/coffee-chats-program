@@ -18,3 +18,9 @@ Last Updated: January 13, 2025
 - Conda environment for dependency management
 - Sample data weighted towards Engineering (25%) and newer employees
 - Availability adjusted automatically for time zones
+
+## Future Improvements
+- Add data validations for:
+  - Time zones (matching with countries)
+  - Countries (standardized list)
+  - Email format consistency

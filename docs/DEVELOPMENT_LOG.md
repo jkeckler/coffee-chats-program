@@ -1,4 +1,32 @@
 # Development Log
+
+## Session Update (January 14, 2025)
+
+### Matching Logic Implementation
+**Situation:** Needed to develop core matching logic for coffee chat groups
+**Task:** Create system to form valid groups and assign captains based on time zone availability
+**Action:** 
+- Implemented CoffeeGroup class with:
+  - Time zone conversion
+  - Overlapping hours detection
+  - Captain assignment logic
+  - Previous captain tracking
+**Result:** Working prototype that can:
+  - Form groups of 2-3 people
+  - Convert and validate overlapping hours across time zones
+  - Avoid assigning back-to-back captains
+  - Generate helpful captain messages with local meeting times
+
+### Next Steps
+1. Connect matching logic to Excel data
+2. Implement full group formation for all participants
+3. Consider future enhancements:
+   - SQL database for captain history
+   - More sophisticated time zone handling
+   - Department mixing optimization
+
+
+# Development Log
 Started: January 13, 2025
 
 ## Sprint 1: Excel Handler Development

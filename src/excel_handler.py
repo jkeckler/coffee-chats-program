@@ -4,10 +4,13 @@ from typing import List, Dict
 import os
 
 class ExcelTemplateHandler:
-    def create_template(self, output_path: str = "participant_template.xlsx") -> None:
+    def create_template(self, output_path: str = "data/participant_template.xlsx") -> None:
         """
         Create a new Excel template file for participant data.
         """
+        # Create data directory if it doesn't exist
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Participants"

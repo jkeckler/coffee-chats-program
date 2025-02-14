@@ -1,10 +1,36 @@
+## Edge Case Handling (Added January 29, 2025)
+
+The system now includes intelligent analysis of unmatched participants:
+
+### Features
+- Analyzes available hours
+- Identifies timezone challenges
+- Provides specific recommendations
+
+### Recommendations Include:
+1. Expanding availability window (for limited hours)
+2. Manual matching consideration (for extreme time zones)
+3. Priority matching in next round (for other cases)
+
+### Usage
+```python
+# Get analysis of unmatched participants
+analysis = matcher.analyze_unmatched_participants()
+
+# Results include:
+# - Name, timezone, department
+# - Number of available hours
+# - Specific recommendations
+
+
+
+
 
 ## Latest Updates (January 14, 2025)
 - Implemented core matching logic
 - Added time zone conversion functionality
 - Created captain assignment system
 - Developed captain notification messages
-
 ## Current Features
 - Group validation based on overlapping hours
 - Time zone conversion for global participants

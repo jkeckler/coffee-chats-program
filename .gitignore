@@ -1,0 +1,7 @@
+echo ".DS_Store
+__pycache__/
+build/
+*.egg-info/
+output.txt
+*.db
+*.xlsx" > .gitignore

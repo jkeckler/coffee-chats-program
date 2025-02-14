@@ -79,11 +79,11 @@ After making changes:
 3. Install dependencies from requirements.txt
 4. Run the program as described in the Usage section
 
-## Contributing
+## Contributing (PLACEHOLDER - DOES NOT EXIST YET)
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## About
 This project aims to foster workplace connections and break down silos in global organizations by facilitating casual coffee chats among employees across different departments and time zones.
 
-## License
+## License (PLACEHOLDER - LICENSE DOES NOT EXIST YET)
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

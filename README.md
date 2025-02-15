@@ -85,5 +85,5 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## About
 This project aims to foster workplace connections and break down silos in global organizations by facilitating casual coffee chats among employees across different departments and time zones.
 
-## License (PLACEHOLDER - LICENSE DOES NOT EXIST YET)
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

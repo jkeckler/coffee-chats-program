@@ -1,7 +1,20 @@
-echo ".DS_Store
+# Python
 __pycache__/
-build/
 *.egg-info/
-output.txt
+build/
+
+# Virtual Environment
+venv/
+
+# System Files
+.DS_Store
+
+# Database
 *.db
-*.xlsx" > .gitignore
+
+# Generated Files
+output.txt
+data/participant_template.xlsx
+
+# Excel
+*.xlsx

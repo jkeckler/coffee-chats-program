@@ -59,11 +59,13 @@ class ExcelTemplateHandler:
     def create_instructions_sheet(self, ws):
         # Add logo
         try:
-            img = openpyxl.drawing.image.Image('assets/nielseniq_logo.png')
+            logo_path = 'assets/nielseniq_logo.png'
+            print(f"Attempting to load logo from: {logo_path}")
+            img = openpyxl.drawing.image.Image(logo_path)
             img.anchor = 'A1'
             ws.add_image(img)
-        except:
-            print("Logo file not found")
+        except Exception as e:
+            print(f"Logo file error: {str(e)}")
 
         # Add title
         ws['B1'] = "Global Coffee Chats Program - Business Intelligence"

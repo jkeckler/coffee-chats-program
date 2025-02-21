@@ -2,3 +2,4 @@ pandas>=2.0.0
 openpyxl>=3.1.0
 xlsxwriter>=3.1.0
 pytest>=7.4.0  # for testing
+Pillow>=11.1.0

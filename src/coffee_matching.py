@@ -8,7 +8,7 @@ import random
 # Change relative imports (.) to absolute imports (src.)
 from src.models import CoffeeGroup, REGIONS
 from src.utils import convert_timezone_to_float
-from src.excel_handler import quick_read_participants as read_participants_from_excel, export_matches_to_excel
+from src.excel_handler import quick_read_participants as read_participants_from_excel, quick_export_matches as export_matches_to_excel
 from src.captain_history import CaptainHistoryDB
 
 class GroupMatcher:
@@ -150,8 +150,8 @@ class GroupMatcher:
         
         return analysis
 
-def run_matching_program(input_path: str = "data/participant_template.xlsx",
-                        output_path: str = "data/coffee_chat_matches_round2.xlsx"):
+def run_matching_program(input_path: str = "data/Coffee_Chats_ParticipantsList.xlsx",
+                        output_path: str = "data/Coffee_Chat_Matches_session3.xlsx"):
     """Main function to run the coffee chat matching program"""
     print("Starting coffee chat matching program...")
     
@@ -180,4 +180,6 @@ def run_matching_program(input_path: str = "data/participant_template.xlsx",
             print(f"Recommendation: {analysis['recommendation']}")
 
 if __name__ == "__main__":
+    import sys
+    print(f"Command line arguments: {sys.argv}")
     run_matching_program()

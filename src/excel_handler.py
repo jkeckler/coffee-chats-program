@@ -366,6 +366,6 @@ def quick_read_participants(filepath: str) -> List[Dict]:
     handler = ExcelTemplateHandler()
     return handler.read_participants_from_excel(filepath)
 
-def export_matches_to_excel(groups: List[CoffeeGroup], output_path: str):
+def quick_export_matches(groups: List[CoffeeGroup], output_path: str):
     handler = ExcelTemplateHandler()
     handler.export_matches_to_excel(groups, output_path)

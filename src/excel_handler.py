@@ -8,6 +8,8 @@ import os
 from src.models import CoffeeGroup
 from src.utils import convert_local_to_utc, generate_time_ranges
 
+
+
 class ExcelTemplateHandler:
     basic_headers = ["Employee ID", "Name", "Email", "Department", "Country", "Timezone", "Start Date", "Status"]
     header_font = Font(bold=True, color="FFFFFF")
@@ -16,27 +18,52 @@ class ExcelTemplateHandler:
     border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
 
     def __init__(self):
-        self.departments = ["Engineering", "Product Management", "Design", "Marketing", "Sales", "Customer Success", "HR", "Finance", "Operations", "Data Science", "Research"]
+        # Single department for your use case
+        self.departments = ["Business Intelligence"]
+        
+        # Updated locations with proper timezone format
         self.locations = {
-            "United States": ["UTC-5", "UTC-6", "UTC-7", "UTC-8"],
-            "India": ["UTC+5:30"],
-            "United Kingdom": ["UTC+0"],
-            "Canada": ["UTC-4", "UTC-5", "UTC-6", "UTC-7", "UTC-8"],
-            "Australia": ["UTC+8", "UTC+9:30", "UTC+10"],
-            "Germany": ["UTC+1", "UTC+2"],
-            "Japan": ["UTC+9"],
-            "Brazil": ["UTC-3", "UTC-4"],
-            "South Africa": ["UTC+2"],
-            "Singapore": ["UTC+8"],
-            "Netherlands": ["UTC+1", "UTC+2"],
-            "France": ["UTC+1", "UTC+2"],
-            "Spain": ["UTC+1", "UTC+2"],
-            "Italy": ["UTC+1", "UTC+2"],
-            "Mexico": ["UTC-6", "UTC-7", "UTC-8"],
-            "China": ["UTC+8"],
+            "United States": ["UTC-12:00", "UTC-11:00", "UTC-10:00", "UTC-09:00", 
+                            "UTC-08:00", "UTC-07:00", "UTC-06:00", "UTC-05:00", "UTC-04:00"],
+            "Canada": ["UTC-08:00", "UTC-07:00", "UTC-06:00", "UTC-05:00", "UTC-04:00"],
+            "India": ["UTC+05:30"],
+            "Colombia": ["UTC-05:00"],
+            "United Kingdom": ["UTC+00:00"],
+            "France": ["UTC+01:00"],
+            "Afghanistan": ["UTC+04:30"],
+            "Australia": ["UTC+08:00", "UTC+09:30", "UTC+10:00"],
+            "Bangladesh": ["UTC+06:00"],
+            "Bhutan": ["UTC+06:00"],
+            "Brunei": ["UTC+08:00"],
+            "Cambodia": ["UTC+07:00"],
+            "China": ["UTC+08:00"],
+            "Germany": ["UTC+01:00", "UTC+02:00"],
+            "Japan": ["UTC+09:00"],
+            "Brazil": ["UTC-05:00", "UTC-04:00", "UTC-03:00", "UTC-02:00"],
+            "South Africa": ["UTC+02:00"],
+            "Singapore": ["UTC+08:00"],
+            "Netherlands": ["UTC+01:00", "UTC+02:00"],
+            "Italy": ["UTC+01:00", "UTC+02:00"],
+            "Mexico": ["UTC-08:00", "UTC-07:00", "UTC-06:00"]
         }
+
+        # Generate list of unique timezones
         self.timezones = sorted(list(set(tz for tzs in self.locations.values() for tz in tzs)))
 
+        # Basic headers for the Excel template
+        self.basic_headers = ["Employee ID", "Name", "Email", "Department", 
+                            "Country", "Timezone", "Start Date", "Status"]
+        
+        # Define styles for Excel formatting
+        self.header_font = Font(bold=True, color="FFFFFF")
+        self.header_fill = PatternFill(start_color="0046BE", end_color="0046BE", fill_type="solid")
+        self.time_fill = PatternFill(start_color="4682B4", end_color="4682B4", fill_type="solid")
+        self.border = Border(
+            left=Side(style='thin'), 
+            right=Side(style='thin'), 
+            top=Side(style='thin'), 
+            bottom=Side(style='thin')
+        )
     def create_template(self, output_path: str = "data/participant_template.xlsx"):
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         wb = openpyxl.Workbook()
@@ -55,7 +82,6 @@ class ExcelTemplateHandler:
 
         wb.save(output_path)
         print(f"Template created at: {output_path}")
-
     def create_instructions_sheet(self, ws):
         # Add logo
         try:
@@ -81,7 +107,6 @@ class ExcelTemplateHandler:
         # Adjust column width for better readability
         ws.column_dimensions['A'].width = 30
         ws.column_dimensions['B'].width = 75
-
     def create_participants_sheet(self, ws):
         # Add headers
         headers = self.basic_headers + ["Total Available Hours"] + [f"{h:02d}:00" for h in range(24)]
@@ -121,7 +146,6 @@ class ExcelTemplateHandler:
         for row in ws['A2:AG1001']:
             for cell in row:
                 cell.protection = Protection(locked=False)
-
     def add_data_validation(self, ws):
         dv_dept = DataValidation(type="list", formula1=f'"{",".join(self.departments)}"', allow_blank=False)
         dv_country = DataValidation(type="list", formula1=f'"{",".join(self.locations.keys())}"', allow_blank=False)
@@ -140,126 +164,205 @@ class ExcelTemplateHandler:
         dv_status.add('H2:H1001')
         for col in range(9, 33):  # Columns I to AF
             dv_yn.add(f'{get_column_letter(col)}2:{get_column_letter(col)}1001')
-
     def add_conditional_formatting(self, ws):
         green_fill = PatternFill(start_color='92D050', end_color='92D050', fill_type='solid')
         rule = CellIsRule(operator='equal', formula=['"Y"'], fill=green_fill)
         
         for col in range(9, 33):  # Columns I to AF
             ws.conditional_formatting.add(f'{get_column_letter(col)}2:{get_column_letter(col)}1001', rule)
-
+    def validate_employee_id(self, id_value) -> str:
+        """
+        Validate and format employee ID
+        Returns formatted ID or raises ValueError if invalid
+        """
+        # Debug output to see what's coming in
+        print(f"Validating ID: {id_value}, type: {type(id_value)}")
+        
+        # Handle None or empty values
+        if id_value is None:
+            raise ValueError("Employee ID cannot be empty")
+            
+        # Convert to string, removing any spaces
+        id_str = str(id_value).strip()
+        
+        # Handle empty strings
+        if not id_str:
+            raise ValueError("Employee ID cannot be empty")
+        
+        # Special case for your exact format which starts with zeros
+        if isinstance(id_value, str) and id_value.isdigit():
+            return id_value
+        
+        try:
+            # Check if it's a valid number
+            id_num = int(id_str)
+            
+            # Format to 8 digits with leading zeros
+            return str(id_num).zfill(8)
+            
+        except ValueError:
+            raise ValueError(f"Invalid Employee ID format: {id_value}")   
     def read_participants_from_excel(self, filepath: str) -> List[Dict]:
         """Read participant data from Excel template and convert to internal format"""
         try:
+            print(f"Opening file: {filepath}")
             wb = openpyxl.load_workbook(filepath)
-            ws = wb.active
+            
+            # Print all sheet names
+            print(f"Sheet names: {wb.sheetnames}")
+            
+            ws = wb['Participants']
             participants = []
             
+            # Get headers
             headers = [cell.value for cell in ws[1]]
             print(f"Found headers: {headers}")
             
+            # Print first few rows for debugging
+            print("First few rows:")
+            for row_idx, row in enumerate(ws.iter_rows(min_row=2, max_row=5)):
+                print(f"Row {row_idx+2}: {[cell.value for cell in row]}")
+
+            print("First few rows with cell details:")
+            for row_idx, row in enumerate(ws.iter_rows(min_row=2, max_row=5)):
+                cell_details = []
+                for cell in row:
+                    cell_details.append(f"Col {cell.column_letter}: {cell.value} (type: {type(cell.value)})")
+                print(f"Row {row_idx+2} details: {cell_details}")
+            
             for row in ws.iter_rows(min_row=2):
+                # Skip rows without an Employee ID
+                if row[0].value is None:
+                    continue
+                    
+                # Skip rows that are completely empty
                 if not any(cell.value for cell in row):
                     continue
                     
-                participant = {
-                    'id': row[0].value,
-                    'name': row[1].value,
-                    'email': row[2].value,
-                    'department': row[3].value,
-                    'country': row[4].value,
-                    'timezone': row[5].value,
-                    'availability': {},
-                    'captain_count': 0
-                }
-                
-                # Convert availability to Y/N format
-                for hour in range(24):
-                    participant['availability'][str(hour)] = 'Y' if row[8 + hour].value == 'Y' else 'N'
+                try:
+                    # Validate employee ID first
+                    employee_id = self.validate_employee_id(row[0].value)
                     
-                participants.append(participant)
+                    # If ID is valid, create participants
+                    participant = {
+                        'id': employee_id,
+                        'name': row[1].value,
+                        'email': row[2].value,
+                        'department': row[3].value,
+                        'country': row[4].value,
+                        'timezone': row[5].value,
+                        'availability': {},
+                        'captain_count': 0
+                    }
+                    
+                    # Basic validation of required fields
+                    if not all([participant['name'], participant['email'], 
+                            participant['department'], participant['country'], 
+                            participant['timezone']]):
+                        print(f"Skipping row with missing required fields: ID {employee_id}")
+                        continue
+                    
+                    # Validate timezone format
+                    if not participant['timezone'].startswith('UTC'):
+                        print(f"Invalid timezone format for {participant['name']}: {participant['timezone']}")
+                        continue
+                    
+                    # Convert availability to Y/N format
+                    availability_start = 9  # Column where availability starts
+                    for hour in range(24):
+                        col_index = availability_start + hour
+                        value = row[col_index].value
+                        participant['availability'][str(hour)] = 'Y' if value == 'Y' else 'N'
+                    
+                    participants.append(participant)
+                    
+                except ValueError as e:
+                    print(f"Skipping row due to validation error: {e}")
+                    continue
             
-            print(f"Found {len(participants)} participants")
+            print(f"Successfully loaded {len(participants)} participants")
             return participants
+            
         except Exception as e:
             print(f"Error reading Excel file: {e}")
             return []
 
-    def export_matches_to_excel(self, groups: List[CoffeeGroup], output_path: str = "data/coffee_chat_matches.xlsx"):
-        """Export matches to Excel with UTC availability ranges"""
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Coffee Chat Groups"
+        def export_matches_to_excel(self, groups: List[CoffeeGroup], output_path: str = "data/coffee_chat_matches.xlsx"):
+            """Export matches to Excel with UTC availability ranges"""
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "Coffee Chat Groups"
 
-        header_font = Font(bold=True)
-        border = Border(
-            left=Side(style='thin'),
-            right=Side(style='thin'),
-            top=Side(style='thin'),
-            bottom=Side(style='thin')
-        )
-        
-        headers = ["Group", "Captain", "Captain Dept", "Members", 
-                  "Member Departments", "Suggested Meeting Time", "UTC Working Hours"]
-        
-        for col, header in enumerate(headers, 1):
-            cell = ws.cell(row=1, column=col)
-            cell.value = header
-            cell.font = header_font
-            cell.border = border
-
-        for idx, group in enumerate(groups, 1):
-            if not group.captain:
-                continue
-                
-            row = idx + 1
+            header_font = Font(bold=True)
+            border = Border(
+                left=Side(style='thin'),
+                right=Side(style='thin'),
+                top=Side(style='thin'),
+                bottom=Side(style='thin')
+            )
             
-            ws.cell(row=row, column=1, value=f"Group {idx}")
-            ws.cell(row=row, column=2, value=f"{group.captain['name']} ({group.captain['timezone']})")
-            ws.cell(row=row, column=3, value=f"{group.captain['department']}")
+            headers = ["Group", "Captain", "Captain Dept", "Members", 
+                    "Member Departments", "Suggested Meeting Time", "UTC Working Hours"]
             
-            other_members = [f"{m['name']} ({m['timezone']})" for m in group.members if m != group.captain]
-            ws.cell(row=row, column=4, value="\n".join(other_members))
-            
-            member_depts = [f"{m['name']}: {m['department']}" for m in group.members if m != group.captain]
-            ws.cell(row=row, column=5, value="\n".join(member_depts))
-            
-            if group.optimal_meeting_time is not None:
-                ws.cell(row=row, column=6, value=f"{group.optimal_meeting_time:02d}:00 UTC")
-            
-            utc_hours = []
-            for member in group.members:
-                member_utc_hours = set()
-                for hour, status in member['availability'].items():
-                    if status == 'Y':
-                        utc_hour = convert_local_to_utc(hour, member['timezone'])
-                        if utc_hour is not None:
-                            member_utc_hours.add(utc_hour)
-                time_ranges = generate_time_ranges(sorted(member_utc_hours))
-                utc_hours.append(f"{member['name']}: {time_ranges}")
-                
-            ws.cell(row=row, column=7, value="\n".join(utc_hours))
-
-            for col in range(1, 8):
-                cell = ws.cell(row=row, column=col)
+            for col, header in enumerate(headers, 1):
+                cell = ws.cell(row=1, column=col)
+                cell.value = header
+                cell.font = header_font
                 cell.border = border
-                cell.alignment = Alignment(wrapText=True, vertical='center')
 
-        for column in ws.columns:
-            max_length = 0
-            column = [cell for cell in column]
-            for cell in column:
-                if cell.value:
-                    lines = str(cell.value).count('\n') + 1
-                    max_length = max(max_length, 
-                                   max(len(line) for line in str(cell.value).split('\n')))
-                    ws.row_dimensions[cell.row].height = max(15 * lines, 20)
-            ws.column_dimensions[column[0].column_letter].width = max_length + 2
+            for idx, group in enumerate(groups, 1):
+                if not group.captain:
+                    continue
+                    
+                row = idx + 1
+                
+                ws.cell(row=row, column=1, value=f"Group {idx}")
+                ws.cell(row=row, column=2, value=f"{group.captain['name']} ({group.captain['timezone']})")
+                ws.cell(row=row, column=3, value=f"{group.captain['department']}")
+                
+                other_members = [f"{m['name']} ({m['timezone']})" for m in group.members if m != group.captain]
+                ws.cell(row=row, column=4, value="\n".join(other_members))
+                
+                member_depts = [f"{m['name']}: {m['department']}" for m in group.members if m != group.captain]
+                ws.cell(row=row, column=5, value="\n".join(member_depts))
+                
+                if group.optimal_meeting_time is not None:
+                    ws.cell(row=row, column=6, value=f"{group.optimal_meeting_time:02d}:00 UTC")
+                
+                utc_hours = []
+                for member in group.members:
+                    member_utc_hours = set()
+                    for hour, status in member['availability'].items():
+                        if status == 'Y':
+                            utc_hour = convert_local_to_utc(hour, member['timezone'])
+                            if utc_hour is not None:
+                                member_utc_hours.add(utc_hour)
+                    time_ranges = generate_time_ranges(sorted(member_utc_hours))
+                    utc_hours.append(f"{member['name']}: {time_ranges}")
+                    
+                ws.cell(row=row, column=7, value="\n".join(utc_hours))
 
-        wb.save(output_path)
-        print(f"Match results exported to: {output_path}")
+                for col in range(1, 8):
+                    cell = ws.cell(row=row, column=col)
+                    cell.border = border
+                    cell.alignment = Alignment(wrapText=True, vertical='center')
 
-def read_participants_from_excel(filepath: str) -> List[Dict]:
+            for column in ws.columns:
+                max_length = 0
+                column = [cell for cell in column]
+                for cell in column:
+                    if cell.value:
+                        lines = str(cell.value).count('\n') + 1
+                        max_length = max(max_length, 
+                                    max(len(line) for line in str(cell.value).split('\n')))
+                        ws.row_dimensions[cell.row].height = max(15 * lines, 20)
+                ws.column_dimensions[column[0].column_letter].width = max_length + 2
+
+            wb.save(output_path)
+            print(f"Match results exported to: {output_path}")
+
+def quick_read_participants(filepath: str) -> List[Dict]:
+    """Convenience function to read participants without creating a handler manually"""
     handler = ExcelTemplateHandler()
     return handler.read_participants_from_excel(filepath)
 

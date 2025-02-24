@@ -9,7 +9,7 @@ from src.excel_handler import ExcelTemplateHandler
 
 def test_read_participants():
     # Specify the path to your test Excel file
-    filepath = "data/participant_template.xlsx"
+    filepath = "data/Coffee_Chats_ParticipantsList.xlsx"
     
     print(f"Reading participants from: {filepath}")
     

@@ -8,7 +8,7 @@ import random
 # Change relative imports (.) to absolute imports (src.)
 from src.models import CoffeeGroup, REGIONS
 from src.utils import convert_timezone_to_float
-from src.excel_handler import read_participants_from_excel, export_matches_to_excel
+from src.excel_handler import quick_read_participants as read_participants_from_excel, export_matches_to_excel
 from src.captain_history import CaptainHistoryDB
 
 class GroupMatcher:

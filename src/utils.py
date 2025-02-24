@@ -8,25 +8,30 @@ from typing import Dict
 
 def convert_timezone_to_float(timezone_str: str) -> float:
     """
-    Convert timezone string (e.g., 'UTC+5:30') to decimal hours (e.g., 5.5)
+    Convert timezone string (e.g., 'UTC+5:30' or 'UTC+05:00') to decimal hours
     
     Args:
-        timezone_str: String in format 'UTC±H' or 'UTC±H:MM'
+        timezone_str: String in format 'UTC±H:MM' or 'UTC±HH:00'
     
     Returns:
         float: Timezone offset in decimal hours
     
     Example:
-        >>> convert_timezone_to_float('UTC+5:30')
+        >>> convert_timezone_to_float('UTC-05:00')
+        -5.0
+        >>> convert_timezone_to_float('UTC+05:30')
         5.5
-        >>> convert_timezone_to_float('UTC-8')
-        -8.0
     """
-    timezone_str = timezone_str.replace('UTC', '')
+    # Remove 'UTC' and any ':00' endings
+    timezone_str = timezone_str.replace('UTC', '').replace(':00', '')
+    
+    # Handle timezones with minutes
     if ':' in timezone_str:
         hours, minutes = map(int, timezone_str.split(':'))
-        # Handle negative timezones correctly by applying the sign to the minutes conversion
+        # For negative hours, we need to make the minutes negative too
         return hours + (minutes/60) * (1 if hours >= 0 else -1)
+    
+    # Handle simple hour offsets
     return float(timezone_str)
 
 def convert_local_to_utc(local_hour: str, timezone: str) -> int:

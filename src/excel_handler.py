@@ -367,5 +367,79 @@ def quick_read_participants(filepath: str) -> List[Dict]:
     return handler.read_participants_from_excel(filepath)
 
 def quick_export_matches(groups: List[CoffeeGroup], output_path: str):
-    handler = ExcelTemplateHandler()
-    handler.export_matches_to_excel(groups, output_path)
+    """Quick implementation to export matches to Excel"""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Coffee Chat Groups"
+    
+    # Add headers
+    headers = ["Group", "Captain", "Captain Dept", "Members", 
+              "Member Departments", "Suggested Meeting Time", "UTC Working Hours"]
+    
+    header_font = Font(bold=True)
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col)
+        cell.value = header
+        cell.font = header_font
+        cell.border = border
+    
+    # Add data
+    for idx, group in enumerate(groups, 1):
+        if not group.captain:
+            continue
+            
+        row = idx + 1
+        
+        ws.cell(row=row, column=1, value=f"Group {idx}")
+        ws.cell(row=row, column=2, value=f"{group.captain['name']} ({group.captain['timezone']})")
+        ws.cell(row=row, column=3, value=f"{group.captain['department']}")
+        
+        other_members = [f"{m['name']} ({m['timezone']})" for m in group.members if m != group.captain]
+        ws.cell(row=row, column=4, value="\n".join(other_members))
+        
+        member_depts = [f"{m['name']}: {m['department']}" for m in group.members if m != group.captain]
+        ws.cell(row=row, column=5, value="\n".join(member_depts))
+        
+        if group.optimal_meeting_time is not None:
+            ws.cell(row=row, column=6, value=f"{group.optimal_meeting_time:02d}:00 UTC")
+        
+        utc_hours = []
+        for member in group.members:
+            member_utc_hours = set()
+            for hour, status in member['availability'].items():
+                if status == 'Y':
+                    utc_hour = convert_local_to_utc(hour, member['timezone'])
+                    if utc_hour is not None:
+                        member_utc_hours.add(utc_hour)
+            time_ranges = generate_time_ranges(sorted(member_utc_hours))
+            utc_hours.append(f"{member['name']}: {time_ranges}")
+            
+        ws.cell(row=row, column=7, value="\n".join(utc_hours))
+
+        for col in range(1, 8):
+            cell = ws.cell(row=row, column=col)
+            cell.border = border
+            cell.alignment = Alignment(wrapText=True, vertical='center')
+
+    # Auto-adjust column widths
+    for column in ws.columns:
+        max_length = 0
+        column = [cell for cell in column]
+        for cell in column:
+            if cell.value:
+                lines = str(cell.value).count('\n') + 1
+                max_length = max(max_length, 
+                              max(len(line) for line in str(cell.value).split('\n')))
+                ws.row_dimensions[cell.row].height = max(15 * lines, 20)
+        ws.column_dimensions[column[0].column_letter].width = max_length + 2
+    
+    # Save the file
+    wb.save(output_path)
+    print(f"Match results exported to: {output_path}")

@@ -37,7 +37,7 @@ class CoffeeGroup:
     Handles availability matching, captain assignment, and meeting time selection.
     """
     
-    def __init__(self, members: List[dict], min_overlap_hours: int = 1):
+    def __init__(self, members: List[dict], min_overlap_hours: int = 2):
         """
         Initialize a coffee chat group.
         
